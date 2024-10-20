@@ -1,13 +1,10 @@
-# Design Science Research methodology in Latex
+\documentclass[margin=0.2in]{standalone}
+\usepackage{dsrm}
 
-## Installation
-
-Copy the `dsrm.sty` to your project.
-
-## Usage
+\begin{document}
+\pagestyle{empty}
 
 
-```latex
 \SDR{
     \ProblemIdentification[How to edit the DSRM diagrams in \LaTeX]{Research methodology must be included in papers.\\\vspace{8pt}Creating DSRM diagrams in other tools and importing them is labour intensive.}
     \ObjectivesOfTheSolution{The tool should integrate seamlessly in any \LaTeX\ tool, e.g. Overleaf, TexShop\\\vspace{8pt}The tool should have a usable interface, hiding its implementation.}
@@ -16,4 +13,5 @@ Copy the `dsrm.sty` to your project.
     \Evaluation{Can render the diagram in multiple classes}
     \Communication{Create a \LaTeX\ package}
 }
-```
+
+\end{document}

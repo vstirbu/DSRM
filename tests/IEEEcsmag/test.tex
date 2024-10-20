@@ -1,0 +1,69 @@
+\documentclass{IEEEcsmag}
+
+\usepackage[colorlinks,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
+\expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks\do\/\do\*\do\-\do\~\do\'\do\"\do\-}
+\usepackage{upmath,color}
+\usepackage{dsrm}
+
+
+\jvol{XX}
+
+
+\jnum{XX}
+\paper{8}
+\jmonth{Month}
+\jname{Publication Name}
+\jtitle{Publication Title}
+\pubyear{2021}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+
+\sptitle{Article Type: Description  (see below for more detail)}
+
+% \title{Regulatory Constraints on Using Generative AI Technologies in the SDLC of Certified Medical Devices: An Industry Perspective}
+\title{Title}
+
+\author{First A. Author}
+\affil{University of California, Berkeley, CA, 94720, USA}
+
+\author{Second Author Jr.}
+\affil{Company, City, (State), Postal Code, Country}
+
+\author{Third Author III}
+\affil{Institute, City, (State), Postal Code, Country}
+
+\markboth{THEME/FEATURE/DEPARTMENT}{THEME/FEATURE/DEPARTMENT}
+
+\begin{abstract}\looseness-1Abstract text goes here. 
+\end{abstract}
+
+\maketitle
+
+
+\chapteri{T}he introduction should provide background information (including relevant references) and should indicate the purpose of the manuscript. Cite relevant work by others, including research outside your company or institution. Place your work in perspective by referring to other research\break papers.
+
+\begin{figure*}
+    \centering
+    \resizebox{\textwidth}{!}{%
+        \SDR{
+            \ProblemIdentification[How to edit the DSRM diagrams in \LaTeX]{Research methodology must be included in papers.\\\vspace{8pt}Creating DSRM diagrams in other tools and importing them is labour intensive.}
+            \ObjectivesOfTheSolution{The tool should integrate seamlessly in any \LaTeX\ tool, e.g. Overleaf, TexShop\\\vspace{8pt}The tool should have a usable interface, hiding its implementation.}
+            \Demonstration{Can type the text and diagram is rendered automatically}
+            \DesignAndDevelopment{Develop the tool that draws the DSRM diagram using TikZ package.}
+            \Evaluation{Can render the diagram in multiple classes}
+            \Communication{Create a \LaTeX\ package}
+        }
+    }
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure*}
+
+
+\end{document}
+

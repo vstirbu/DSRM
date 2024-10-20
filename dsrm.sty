@@ -9,6 +9,10 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows.meta}
 
+% The height of the lower box
+\def\inputboxheight{6}
+\def\phaseboxheight{7}
+
 %https://tex.stackexchange.com/a/408183/255362
 \newlength{\mywidth}
 
@@ -30,10 +34,10 @@
     \setlength{\mywidth}{4cm}
     % \addtolength{\mywidth}{-#1cm}
     \addtolength{\mywidth}{-.5em}
-    \draw[thick, fill=white] (0,0) rectangle (4,7);
-    \draw[] (2,6) rectangle (2,6)
+    \draw[thick, fill=white] (0,0) rectangle (4,\phaseboxheight);
+    \draw[] (2,\phaseboxheight-1) rectangle (2,\phaseboxheight-1)
     node[midway, text width=\mywidth, text centered] {\textbf{\phasetitle{#2}}};
-    \draw (2,5) rectangle (2,5)
+    \draw (2,\phaseboxheight-2) rectangle (2,\phaseboxheight-2)
     node[below,text width=\mywidth, text centered] {#3};
 
     \ifthenelse{\equal{#1}{}}{
@@ -43,8 +47,8 @@
         
         \draw[ultra thick,-{Stealth}, gray, dashed] (2,-1) -- (2,0);%
     }{
-        \draw[thick] (0,-6) rectangle (4, -1);
-        \fill[gray, fill opacity=.1] (0,-6) rectangle (4, -1);
+        \draw[thick] (0,-\inputboxheight) rectangle (4, -1);
+        \fill[gray, fill opacity=.1] (0,-\inputboxheight) rectangle (4, -1);
         \draw[] (2,-2) rectangle (2, -2)
         node[midway, text width=\mywidth, text centered] {\textbf{\phaseinput{#2}}};
         \draw (2,-3) rectangle (2, -3)
@@ -56,17 +60,16 @@
 
 \newcommand{\sdrmphase}[2]{
     \setlength{\mywidth}{4cm}
-    % \addtolength{\mywidth}{-#1cm}
     \addtolength{\mywidth}{-1.5em}
-    \draw[thick, fill=white] (0,0) rectangle (4,7);
-    \draw[] (2,6) rectangle (2,6)
+    \draw[thick, fill=white] (0,0) rectangle (4,\phaseboxheight);
+    \draw[] (2,\phaseboxheight-1) rectangle (2,\phaseboxheight-1)
     node[midway, text width=\mywidth, text centered] {%
         \textbf{%
-        \ifthenelse{\equal{#1}{5}}{Evaluation}{}%
-        \ifthenelse{\equal{#1}{6}}{Communication}{}
+            \ifthenelse{\equal{#1}{5}}{Evaluation}{}%
+            \ifthenelse{\equal{#1}{6}}{Communication}{}
         }
         };
-    \draw (2,5) rectangle (2,5)
+    \draw (2,\phaseboxheight-2) rectangle (2,\phaseboxheight-2)
     node[below,text width=\mywidth, text centered] {#2};
 }
 
@@ -117,12 +120,13 @@
 
     \begin{tikzpicture}[font=\large]%\sffamily]%, every node/.style={scale=1.2}]
         \begin{scope}
-            \draw[ultra thick,-{Stealth}] (4,6) -- (24.5,6);
-            \draw[ultra thick] (6.5,8) -- (24.5,8);
-            \draw[ultra thick,-{Stealth}] (6.5,8) -- (6.5,7);
-            \draw[ultra thick,-{Stealth}] (11,8) -- (11,7);
-            \draw[ultra thick] (20,7) -- (20,8);
-            \draw[ultra thick] (24.5,7) -- (24.5,8);        
+            % horizontal line through phase boxes
+            \draw[ultra thick,-{Stealth}] (4,\phaseboxheight-1) -- (22.5,\phaseboxheight-1);
+            \draw[ultra thick] (6.5,\phaseboxheight+1) -- (24.5,\phaseboxheight+1);
+            \draw[ultra thick,-{Stealth}] (6.5,\phaseboxheight+1) -- (6.5,\phaseboxheight);
+            \draw[ultra thick,-{Stealth}] (11,\phaseboxheight+1) -- (11,\phaseboxheight);
+            \draw[ultra thick] (20,\phaseboxheight) -- (20,\phaseboxheight+1);
+            \draw[ultra thick] (24.5,\phaseboxheight) -- (24.5,\phaseboxheight+1);        
         \end{scope}   
         #1
     \end{tikzpicture}
