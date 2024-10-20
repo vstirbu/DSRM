@@ -1,0 +1,59 @@
+\documentclass{article}
+% \documentclass[margin=0.1in]{standalone}
+\usepackage{dsrm}
+
+\begin{document}
+\pagestyle{empty}
+
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[scale=.9, font=\sffamily]
+    \begin{scope}
+        \draw[ultra thick,-{Stealth}] (4,6) -- (25,6);
+        \draw[ultra thick] (7,8) -- (27,8);
+        \draw[ultra thick,-{Stealth}] (7,8) -- (7,7);
+        \draw[ultra thick,-{Stealth}] (12,8) -- (12,7);
+        \draw[ultra thick] (22,7) -- (22,8);
+        \draw[ultra thick] (27,7) -- (27,8);
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(0, 0)}
+        ]
+        \sdrmphaseinputt{1}{Evaluate if GenAI tools can be used to make the process?\vspace{8pt}\\Evaluate if GenAI tools can be used to make the process?};
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(5, 0)}
+        ]
+        \sdrmphaseinputt[How to make something that is longer than one line]{2}{Evaluate if GenAI tools can be used to make the process};
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(10, 0)}
+        ]
+        \sdrmphaseinputt
+            {3}{Evaluate if GenAI tools can be used to make the process};
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(15, 0)}
+        ]
+        \sdrmphaseinputt{4}{Evaluate if GenAI tools can be used to make the process};
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(20, 0)}
+        ]
+        \sdrmphase{5}{Evaluate if GenAI tools can be used to make the process};
+    \end{scope}
+
+    \begin{scope}[
+        shift = {(25, 0)}
+        ]
+        \sdrmphase{6}{Evaluate if GenAI tools can be used to make the process};
+    \end{scope}
+\end{tikzpicture}
+}
+
+
+\end{document}
