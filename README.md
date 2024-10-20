@@ -1,11 +1,14 @@
 # Design Science Research methodology in Latex
 
+This a package that allows you to create Design Science Research diagrams in Latex.
+
 ## Installation
 
 Copy the `dsrm.sty` to your project.
 
 ## Usage
 
+Write the text
 
 ```latex
 \SDR{
@@ -17,3 +20,7 @@ Copy the `dsrm.sty` to your project.
     \Communication{Create a \LaTeX\ package}
 }
 ```
+
+gives this result in IEEE Computer Science magazines projects:
+
+![result](assets/result.png)
