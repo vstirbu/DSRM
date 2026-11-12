@@ -1,0 +1,8 @@
+__pycache__/
+tests/**/*.aux
+tests/**/*.fls
+tests/**/*.fdb_latexmk
+tests/**/*.log
+tests/**/*.pdf
+tests/**/*.synctex.gz
+

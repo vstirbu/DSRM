@@ -16,7 +16,7 @@
 % This work consists of the files dsrm.sty
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dsrm}[2024/10/18 DSRM package]
+\ProvidesPackage{dsrm}[2026/11/13 DSRM package]
 
 \RequirePackage{xparse}
 \RequirePackage{ifthen}
@@ -24,9 +24,8 @@
 
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows.meta}
+\usetikzlibrary{backgrounds}
 
-% The height of the lower box
-\def\inputboxheight{6}
 \def\phaseboxheight{7}
 
 %https://tex.stackexchange.com/a/408183/255362
@@ -62,15 +61,24 @@
         node[midway, text width=\mywidth, text centered, gray] {\textbf{\phaseinput{#2}}};
         
         \draw[ultra thick,-{Stealth}, gray, dashed] (2,-1) -- (2,0);%
-    }{
-        \draw[thick] (0,-\inputboxheight) rectangle (4, -1);
-        \fill[gray, fill opacity=.1] (0,-\inputboxheight) rectangle (4, -1);
-        \draw[] (2,-2) rectangle (2, -2)
-        node[midway, text width=\mywidth, text centered] {\textbf{\phaseinput{#2}}};
-        \draw (2,-3) rectangle (2, -3)
-        node[below, text width=\mywidth, text centered] {#1};
-        
-        \draw[ultra thick,-{Stealth}] (2,-1) -- (2,0);%
+        }{
+        \node[text width=\mywidth, text centered]
+            at (2,-2) {\textbf{\phaseinput{#2}}};
+
+        \node[anchor=north, text width=\mywidth, text centered]
+            (inputtext) at (2,-3) {#1};
+
+        % Add padding below the actual text.
+        \coordinate (inputbottom)
+            at ([yshift=-.5em]inputtext.south);
+
+        % Draw behind the text.
+        \begin{scope}[on background layer]
+            \draw[thick, fill=gray, fill opacity=.1]
+                (0,-1) rectangle (4,0 |- inputbottom);
+        \end{scope}
+
+        \draw[ultra thick,-{Stealth}] (2,-1) -- (2,0);
     }
 }
 
