@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper to DSR"
+  short_description: "Create evidence-based DSR diagrams from papers"
+  default_prompt: "Use $paper-to-dsr to create a DSR diagram from this paper, with LaTeX, a rendered PDF, and supporting evidence."

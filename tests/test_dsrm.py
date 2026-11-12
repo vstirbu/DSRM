@@ -58,6 +58,20 @@ class DsrmTests(unittest.TestCase):
     def test_article_example(self):
         self.compile(example="tests/article/main.tex")
 
+    def test_skill_bundled_assets_match_repository(self):
+        assets = ROOT / "skills" / "paper-to-dsr" / "assets"
+        for original, bundled in (("dsrm.sty", "dsrm.sty"), ("LICENSE", "LICENSE-LPPL")):
+            with self.subTest(asset=bundled):
+                self.assertEqual(
+                    (assets / bundled).read_bytes(), (ROOT / original).read_bytes(),
+                    "Run python3 scripts/sync_skill_assets.py to refresh skill assets",
+                )
+
+    def test_skill_templates(self):
+        for template in ("single-pass.tex", "iterations.tex"):
+            with self.subTest(template=template):
+                self.compile(example=f"skills/paper-to-dsr/assets/{template}")
+
     def test_diagram_has_no_extra_horizontal_space(self):
         log = self.compile(source=r"""
 \newsavebox{\diagram}

@@ -91,6 +91,33 @@ The complete [iteration example](tests/iterations/test.tex) produces:
 
 ![Iterations](assets/iterations.png)
 
+## Paper-to-DSR skill
+
+The reusable agent skill lives in [skills/paper-to-dsr](skills/paper-to-dsr/SKILL.md).
+It includes evidence-mapping guidance, the rendering package and its license, and
+working templates for single-pass and iterative diagrams. Supply the full skill
+folder and the paper to your agent. A suitable task is:
+
+> Use the paper-to-dsr skill to create a DSR diagram from this paper. Deliver the
+> LaTeX source, rendered PDF, and a mapping from diagram content to paper evidence.
+
+The canonical rendering package remains the root `dsrm.sty`. After changing it
+or the license, refresh the skill's bundled assets before committing or releasing:
+
+```sh
+python3 scripts/sync_skill_assets.py
+```
+
+The test suite checks that bundled assets match their originals and compiles
+both skill templates. The skill's own version is recorded in its `SKILL.md`
+metadata and can change independently of the package version.
+
+The skill instructions, references, agent metadata, templates, and asset-sync
+helper use the [MIT license](skills/paper-to-dsr/LICENSE). The rendering package
+retains its existing [LPPL license](LICENSE), also bundled separately as
+[LICENSE-LPPL](skills/paper-to-dsr/assets/LICENSE-LPPL). The skill's MIT license
+does not relicense `dsrm.sty`.
+
 ## Tests
 
 Run the automated suite from the project root:
