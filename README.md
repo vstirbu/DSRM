@@ -11,7 +11,7 @@ Copy the `dsrm.sty` to your project.
 Write the text
 
 ```latex
-\SDR{
+\DSR{
     \ProblemIdentification[How to edit the DSRM diagrams in \LaTeX]{Research methodology must be included in papers.\\\vspace{8pt}Creating DSRM diagrams in other tools and importing them is labour intensive.}
     \ObjectivesOfTheSolution{The tool should integrate seamlessly in any \LaTeX\ tool, e.g. Overleaf, TexShop\\\vspace{8pt}The tool should have a usable interface, hiding its implementation.}
     \DesignAndDevelopment{Develop the tool that draws the DSRM diagram using TikZ package.}
@@ -42,7 +42,7 @@ To show gray placeholders with dashed arrows for empty inputs, enable the
 ```
 
 You can also switch this flag in the document with `\dsrmshowemptyinputstrue`
-and `\dsrmshowemptyinputsfalse` before `\SDR{...}`. Wrap the switch and diagram
+and `\dsrmshowemptyinputsfalse` before `\DSR{...}`. Wrap the switch and diagram
 in `\begingroup ... \endgroup` to apply it locally. Inputs containing text
 always render normally, regardless of the flag.
 

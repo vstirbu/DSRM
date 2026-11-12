@@ -16,7 +16,7 @@
 % This work consists of the files dsrm.sty
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dsrm}[2026/11/13 DSRM package]
+\ProvidesPackage{dsrm}[2026/11/13 v0.1.0 DSRM diagrams]
 
 \newif\ifdsrmshowemptyinputs
 \dsrmshowemptyinputsfalse
@@ -126,7 +126,7 @@
 }
 
 
-\newcommand{\SDR}[1]{%
+\newcommand{\DSR}[1]{%
     \begingroup%
     \setlength{\phaseboxheight}{3cm}%
     \newcommand{\ProblemIdentification}[2][]{\dsrmmeasurephase{.5em}{##2}}%

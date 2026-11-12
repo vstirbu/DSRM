@@ -66,7 +66,7 @@ class DsrmTests(unittest.TestCase):
     \typeout{DSRM-expected=\the\dimexpr\pgf@picmaxx-\pgf@picminx\relax}%
 }}}
 \makeatother
-\sbox{\diagram}{\SDR{
+\sbox{\diagram}{\DSR{
     \ProblemIdentification[Input text]{Phase body.}
     \ObjectivesOfTheSolution{Phase body.}
     \DesignAndDevelopment{Phase body.}
@@ -93,7 +93,7 @@ class DsrmTests(unittest.TestCase):
     def test_all_optional_inputs(self):
         self.compile(source=r"""
 \resizebox{\textwidth}{!}{%
-\SDR{
+\DSR{
     \ProblemIdentification[Short input]{Identify the problem.}
     \ObjectivesOfTheSolution[First line\\Second line]{Define objectives.}
     \DesignAndDevelopment[\textbf{Formatted input}\par Another paragraph.]
@@ -115,7 +115,7 @@ class DsrmTests(unittest.TestCase):
             for label, optional in (("omitted", ""), ("empty", "[]"), ("filled", "[Input text]")):
                 marker = f"{index}-{label}"
                 diagrams.append(
-                    r"\sbox{\diagram}{\SDR{"
+                    r"\sbox{\diagram}{\DSR{"
                     + "\\" + command + optional + "{Phase body.}"
                     # Without an input, the lowest edge is the phase rectangle at y=0.
                     # Its 0.4pt half-stroke and the upper connector's 0.8pt half-stroke
@@ -157,7 +157,7 @@ class DsrmTests(unittest.TestCase):
                 for label, optional in (("omitted", ""), ("empty", "[]"), ("filled", "[Input text]")):
                     marker = f"{state}-{index}-{label}"
                     diagrams.append(
-                        r"\sbox{\diagram}{\SDR{"
+                        r"\sbox{\diagram}{\DSR{"
                         + "\\" + command + optional + "{Phase body.}"
                         + rf"\typeout{{DSRM-{marker}-expected=\the\dimexpr\phaseboxheight+1cm+1.2pt\relax}}"
                         + "}}\n"
@@ -251,7 +251,7 @@ class DsrmTests(unittest.TestCase):
                             rf"\typeout{{DSRM-{label}-phase=\the\phaseboxheight}}"
                         )
                     diagrams.append(
-                        r"\sbox{\diagram}{\SDR{" + "\n".join(phases) + "}}\n"
+                        r"\sbox{\diagram}{\DSR{" + "\n".join(phases) + "}}\n"
                         + rf"\typeout{{DSRM-{label}-height=\the\dimexpr\ht\diagram+\dp\diagram\relax}}"
                     )
                 log = self.compile(source=r"\newsavebox{\diagram}" + "\n".join(diagrams)
