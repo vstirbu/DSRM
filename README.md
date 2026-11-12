@@ -49,6 +49,48 @@ always render normally, regardless of the flag.
 Phase bodies are typeset once for measurement and again for drawing. Avoid
 commands with side effects, such as counter increments, inside phase text.
 
+## Iterations
+
+Use `\DSRIterations` with an `\Iteration` for each row. Reuse the same phase
+commands, in methodology order, and include only the phases needed in that row:
+
+```latex
+\DSRIterations{
+    \Iteration{
+        \ProblemIdentification{Identify the problem.}
+        \ObjectivesOfTheSolution[Starting point]{Define the objectives.}
+        \DesignAndDevelopment{Develop the initial solution.}
+        \Demonstration{Demonstrate the solution.}
+        \Evaluation{Evaluate the initial solution.}
+    }
+    \Iteration{
+        \DesignAndDevelopment{Improve the solution.}
+        \Demonstration{Demonstrate the improvements.}
+        \Evaluation{Evaluate the improvements.}
+        \Communication{Publish the results and supporting tools.}
+    }
+    \Iteration{
+        \DesignAndDevelopment{Make the final refinements.}
+    }
+}
+```
+
+Phase columns stay aligned across rows. Each row sizes itself to its tallest
+phase and connects its phases from left to right. A feedback arrow connects the
+last phase of each row to the first phase of the next row. Optional inputs and
+`showemptyinputs` work here too; rows move down as needed to leave room for input
+boxes and feedback arrows.
+
+Include `\Communication` once, on the row where you want it displayed. The final
+iteration connects to it, including an upward connection when communication is
+on an earlier row. Communication is excluded from the intermediate feedback
+chain. Each row must contain at least one other phase, and each phase can appear
+at most once per row. Omit communication to draw only the iteration chain.
+
+The complete [iteration example](tests/iterations/test.tex) produces:
+
+![Iterations](assets/iterations.png)
+
 ## Tests
 
 Run the automated suite from the project root:
@@ -68,7 +110,9 @@ The suite compiles the article, standalone, and IEEE examples, exercises
 all four optional phase inputs with wrapped and formatted text, and checks
 that input boxes grow with their content while preserving width and bottom
 padding. It also checks that any of the six phases can set the shared phase
-height and that subsequent diagrams reset their height. Builds use temporary
+height and that subsequent diagrams reset their height. Iteration tests cover
+the example, column alignment, row heights, and clearance around inputs.
+Builds use temporary
 directories and leave the example files untouched.
 These checks verify compilation and geometry; visual styling still needs review
 of the rendered PDF.

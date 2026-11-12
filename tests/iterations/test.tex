@@ -1,0 +1,36 @@
+\documentclass[margin=0.2in]{standalone}
+\usepackage{../../dsrm}
+
+\begin{document}
+\DSRIterations{
+    \Iteration{
+        \ProblemIdentification{Developer experience for quantum programming is brittle.
+            Easy to start, difficult to scale up.\par
+            The development process requires deep understanding of the technology stack.}
+        \ObjectivesOfTheSolution[How can containerized workloads improve developer
+            experience by reducing the operational complexity associated with executing
+            quantum software across heterogeneous execution environments?]{Separate the
+            concerns of software developers from the operators of hardware.\par
+            Identify the abstraction layers that encapsulate the concerns.}
+        \DesignAndDevelopment{Define the execution model and the abstraction layers
+            that separate the concerns of software developers from the operators of
+            hardware.\par Create templates for execution targets.}
+        \Demonstration{Execute quantum workloads on remote infrastructure using
+            different targets.}
+        \Evaluation{Workshop to evaluate the use of container technologies and
+            abstraction layers.}
+    }
+    \Iteration{
+        \DesignAndDevelopment{Develop the initial version of the q8s toolkit that
+            automates the process of preparing and executing quantum workloads.}
+        \Demonstration{Execute workloads via the q8s toolkit.}
+        \Evaluation{Workshop to evaluate the use of the q8s toolkit to execute
+            quantum workloads.}
+        \Communication{Create this publication.\par Document the methodology and
+            publish the supporting tools as open source.}
+    }
+    \Iteration{
+        \DesignAndDevelopment{Enhance the capabilities of the q8s toolkit.}
+    }
+}
+\end{document}

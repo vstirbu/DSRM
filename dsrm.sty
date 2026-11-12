@@ -16,7 +16,7 @@
 % This work consists of the files dsrm.sty
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dsrm}[2026/11/13 v0.1.0 DSRM diagrams]
+\ProvidesPackage{dsrm}[2026/11/13 v0.2.0 DSRM diagrams]
 
 \newif\ifdsrmshowemptyinputs
 \dsrmshowemptyinputsfalse
@@ -193,3 +193,201 @@
     \end{tikzpicture}%
     \endgroup%
 }%
+
+% Iterated diagrams keep phase columns fixed and measure each row separately.
+\newif\ifdsrmiterationmeasuring
+\newcount\dsrmiterationrow
+\newcount\dsrmiterationpreviousrow
+\newcount\dsrmiterationcommunicationrow
+\newcount\dsrmiterationindex
+\newcount\dsrmiterationendindex
+\newlength{\dsrmiterationtop}
+\newlength{\dsrmiterationbottom}
+\newlength{\dsrmiterationpreviousbottom}
+\newlength{\dsrmiterationx}
+\newlength{\dsrmiterationoccupied}
+
+\newcommand{\dsrmiterationclearance}[1]{%
+    \ifcsname dsrmiterationcolumn#1\endcsname
+        \setlength{\dsrmiterationoccupied}{%
+            \csname dsrmiterationcolumn#1\endcsname}%
+        \addtolength{\dsrmiterationoccupied}{-1cm}%
+        \ifdim\dsrmiterationoccupied<\dsrmiterationtop
+            \setlength{\dsrmiterationtop}{\dsrmiterationoccupied}%
+        \fi
+    \fi
+}
+
+\newcommand{\dsrmiterationphase}[3][]{%
+    \ifdsrmiterationmeasuring
+        \ifnum#2>\dsrmiterationlastindex\relax
+            \edef\dsrmiterationlastindex{#2}%
+        \else
+            \PackageError{dsrm}{Iteration phases must be in increasing order}%
+                {Use each phase once per iteration, in methodology order.}%
+        \fi
+        \ifnum#2<6
+            \ifx\dsrmiterationfirstindex\empty
+                \edef\dsrmiterationfirstindex{#2}%
+            \fi
+        \fi
+        \edef\dsrmiterationcolumns{\dsrmiterationcolumns
+            \noexpand\dsrmiterationclearance{#2}}%
+        \ifnum#2<5
+            \dsrmmeasurephase{.5em}{#3}%
+        \else
+            \dsrmmeasurephase{1.5em}{#3}%
+        \fi
+    \else
+        \edef\dsrmiterationnode{dsrm-iteration-\the\dsrmiterationrow-phase-#2}%
+        \pgfmathsetlength{\dsrmiterationx}{(#2-1)*4.5cm}%
+        \begin{scope}[shift={(\dsrmiterationx,\dsrmiterationbottom)}]
+            \ifnum#2<5
+                \sdrmphaseinputt[#1]{#2}{#3}{}%
+            \else
+                \sdrmphase{#2}{#3}%
+            \fi
+            \coordinate (\dsrmiterationnode-north) at (2,\phaseboxheight);
+            \coordinate (\dsrmiterationnode-south) at (2,0);
+            \coordinate (\dsrmiterationnode-west) at (0,\phaseboxheight-1cm);
+            \coordinate (\dsrmiterationnode-east) at (4,\phaseboxheight-1cm);
+            \coordinate (\dsrmiterationnode-occupied) at (2,0);
+            \ifnum#2<5
+                \ifthenelse{\equal{#1}{}}{%
+                    \ifdsrmshowemptyinputs
+                        \coordinate (\dsrmiterationnode-occupied) at (2,-3.5);
+                    \fi
+                }{%
+                    \coordinate (\dsrmiterationnode-occupied) at (inputbottom);
+                }%
+            \fi
+        \end{scope}%
+        \pgfextracty{\dsrmiterationoccupied}{%
+            \pgfpointanchor{\dsrmiterationnode-occupied}{center}}%
+        \expandafter\edef\csname dsrmiterationcolumn#2\endcsname{%
+            \the\dsrmiterationoccupied}%
+        \ifnum#2=6
+            \ifx\dsrmiterationcommunication\empty
+                \edef\dsrmiterationcommunication{\dsrmiterationnode}%
+                \dsrmiterationcommunicationrow=\dsrmiterationrow
+            \else
+                \PackageError{dsrm}{Only one Communication phase is allowed}%
+                    {Place Communication in one iteration; the final phase connects to it.}%
+            \fi
+        \else
+            \ifx\dsrmiterationlastnode\empty
+                \edef\dsrmiterationfirstnode{\dsrmiterationnode}%
+            \else
+                \draw[thick,-{Stealth}]
+                    (\dsrmiterationlastnode-east) -- (\dsrmiterationnode-west);
+            \fi
+            \edef\dsrmiterationlastnode{\dsrmiterationnode}%
+            \edef\dsrmiterationlastphase{#2}%
+        \fi
+    \fi
+    \ignorespaces
+}
+
+\newcommand{\dsrmiterationmeasure}[1]{%
+    \advance\dsrmiterationrow by 1
+    \setlength{\phaseboxheight}{3cm}%
+    \def\dsrmiterationlastindex{0}%
+    \let\dsrmiterationfirstindex\empty
+    \let\dsrmiterationcolumns\empty
+    \ignorespaces#1%
+    \expandafter\edef\csname dsrmiterationheight\the\dsrmiterationrow\endcsname{%
+        \the\phaseboxheight}%
+    \expandafter\let\csname dsrmiterationcolumns\the\dsrmiterationrow\endcsname
+        \dsrmiterationcolumns
+    \expandafter\let\csname dsrmiterationfirst\the\dsrmiterationrow\endcsname
+        \dsrmiterationfirstindex
+    \ignorespaces
+}
+
+\newcommand{\dsrmiteration}[1]{%
+    \advance\dsrmiterationrow by 1
+    \setlength{\phaseboxheight}{%
+        \csname dsrmiterationheight\the\dsrmiterationrow\endcsname}%
+    \ifnum\dsrmiterationrow=1
+        \setlength{\dsrmiterationtop}{0pt}%
+    \else
+        \setlength{\dsrmiterationtop}{\dsrmiterationpreviousbottom}%
+        \addtolength{\dsrmiterationtop}{-1cm}%
+    \fi
+    \csname dsrmiterationcolumns\the\dsrmiterationrow\endcsname
+    \expandafter\let\expandafter\dsrmiterationfirstindex
+        \csname dsrmiterationfirst\the\dsrmiterationrow\endcsname
+    \ifx\dsrmiterationfirstindex\empty
+        \PackageError{dsrm}{An iteration needs at least one phase before Communication}%
+            {Add a phase from ProblemIdentification through Evaluation.}%
+    \else
+        % Leave the feedback arrow clear of inputs in all columns it crosses.
+        \ifnum\dsrmiterationrow>1
+            \dsrmiterationindex=\dsrmiterationfirstindex\relax
+            \dsrmiterationendindex=\dsrmiterationpreviousphase\relax
+            \ifnum\dsrmiterationindex>\dsrmiterationendindex
+                \dsrmiterationendindex=\dsrmiterationindex
+                \dsrmiterationindex=\dsrmiterationpreviousphase\relax
+            \fi
+            \loop
+                \dsrmiterationclearance{\the\dsrmiterationindex}%
+                \ifnum\dsrmiterationindex<\dsrmiterationendindex
+                    \advance\dsrmiterationindex by 1
+            \repeat
+        \fi
+        \setlength{\dsrmiterationbottom}{%
+            \dimexpr\dsrmiterationtop-\phaseboxheight\relax}%
+        \let\dsrmiterationfirstnode\empty
+        \let\dsrmiterationlastnode\empty
+        \ignorespaces#1%
+        \ifx\dsrmiterationpreviousnode\empty\else
+            \coordinate (dsrm-iteration-turn) at (0,\dsrmiterationtop+.5cm);
+            \draw[thick,-{Stealth}] (\dsrmiterationpreviousnode-south)
+                -- (\dsrmiterationpreviousnode-south |- dsrm-iteration-turn)
+                -| (\dsrmiterationfirstnode-north);
+        \fi
+        \edef\dsrmiterationpreviousnode{\dsrmiterationlastnode}%
+        \edef\dsrmiterationpreviousphase{\dsrmiterationlastphase}%
+        \dsrmiterationpreviousrow=\dsrmiterationrow
+        \setlength{\dsrmiterationpreviousbottom}{\dsrmiterationbottom}%
+    \fi
+    \ignorespaces
+}
+
+\newcommand{\DSRIterations}[1]{%
+    \begingroup
+    \dsrmiterationrow=0
+    \let\dsrmiterationpreviousnode\empty
+    \let\dsrmiterationcommunication\empty
+    \newcommand{\Iteration}[1]{%
+        \ifdsrmiterationmeasuring
+            \dsrmiterationmeasure{##1}%
+        \else
+            \dsrmiteration{##1}%
+        \fi
+        \ignorespaces}%
+    \newcommand{\ProblemIdentification}[2][]{\dsrmiterationphase[##1]{1}{##2}}%
+    \newcommand{\ObjectivesOfTheSolution}[2][]{\dsrmiterationphase[##1]{2}{##2}}%
+    \newcommand{\DesignAndDevelopment}[2][]{\dsrmiterationphase[##1]{3}{##2}}%
+    \newcommand{\Demonstration}[2][]{\dsrmiterationphase[##1]{4}{##2}}%
+    \newcommand{\Evaluation}[1]{\dsrmiterationphase{5}{##1}}%
+    \newcommand{\Communication}[1]{\dsrmiterationphase{6}{##1}}%
+    \dsrmiterationmeasuringtrue
+    \ignorespaces#1%
+    \dsrmiterationmeasuringfalse
+    \dsrmiterationrow=0
+    \begin{tikzpicture}[font=\large]
+        #1%
+        \ifx\dsrmiterationcommunication\empty\else
+            \ifnum\dsrmiterationcommunicationrow=\dsrmiterationpreviousrow
+                \draw[thick,-{Stealth}] (\dsrmiterationpreviousnode-east)
+                    -- (\dsrmiterationcommunication-west);
+            \else
+                \draw[thick,-{Stealth}] (\dsrmiterationpreviousnode-east)
+                    -- (\dsrmiterationcommunication-south |- \dsrmiterationpreviousnode-east)
+                    -- (\dsrmiterationcommunication-south);
+            \fi
+        \fi
+    \end{tikzpicture}%
+    \endgroup
+}
