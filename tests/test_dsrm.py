@@ -87,6 +87,106 @@ class DsrmTests(unittest.TestCase):
     def test_standalone_example(self):
         self.compile(example="tests/standalone/test.tex")
 
+    def test_iterations_example(self):
+        self.compile(example="tests/iterations/test.tex")
+
+    def test_iterations_support_empty_input_flag_and_multiple_diagrams(self):
+        self.compile(source=r"""
+\dsrmshowemptyinputstrue
+\resizebox{\textwidth}{!}{\DSRIterations{
+    \Iteration{\DesignAndDevelopment{Develop.}\Evaluation{Evaluate.}}
+    \Iteration{\DesignAndDevelopment{Improve.}\Communication{Publish.}}
+}}
+\dsrmshowemptyinputsfalse
+\resizebox{\textwidth}{!}{\DSRIterations{
+    \Iteration{\ProblemIdentification{Identify.}\Evaluation{Evaluate.}}
+    \Iteration{\ObjectivesOfTheSolution{Refine the objectives.}}
+}}
+\resizebox{\textwidth}{!}{\DSR{
+    \ProblemIdentification{A regular diagram still works.}
+    \Communication{Publish.}
+}}
+""")
+
+    def test_iterations_align_columns_and_size_rows_independently(self):
+        log = self.compile(source=r"""
+\newsavebox{\diagram}
+\newdimen\position
+\newcommand{\report}[2]{%
+    \pgfextracty{\position}{\pgfpointanchor{dsrm-iteration-#1-phase-#2-north}{center}}%
+    \typeout{DSRM-#1-#2-top=\the\position}%
+    \pgfextracty{\position}{\pgfpointanchor{dsrm-iteration-#1-phase-#2-south}{center}}%
+    \typeout{DSRM-#1-#2-bottom=\the\position}%
+    \pgfextractx{\position}{\pgfpointanchor{dsrm-iteration-#1-phase-#2-north}{center}}%
+    \typeout{DSRM-#1-#2-x=\the\position}%
+}
+\makeatletter
+\tikzset{every picture/.append style={execute at end picture={%
+    \typeout{DSRM-expectedwidth=\the\dimexpr\pgf@picmaxx-\pgf@picminx\relax}%
+}}}
+\makeatother
+\sbox{\diagram}{\DSRIterations{
+    \Iteration{
+        \ObjectivesOfTheSolution[An input in the unused second column.]{Short body.}
+        \DesignAndDevelopment{Short body.}
+        \Evaluation{Short body.}
+    }
+    \Iteration{
+        \DesignAndDevelopment{First line\\Second line\\Third line\\Fourth line\\
+            Fifth line\\Sixth line\\Seventh line\\Eighth line}
+        \Evaluation{Short body.}
+        \Communication{Publish the results.}
+    }
+    \Iteration{\DesignAndDevelopment{Final refinements.}}
+    \ifdsrmiterationmeasuring\else
+        \report{1}{2}\report{1}{3}\report{1}{5}%
+        \report{2}{3}\report{2}{5}\report{2}{6}\report{3}{3}%
+    \fi
+}}
+\typeout{DSRM-width=\the\wd\diagram}
+\usebox{\diagram}
+""")
+        values = {
+            key: float(value)
+            for key, value in re.findall(r"DSRM-([\w-]+)=(-?[\d.]+)pt", log)
+        }
+        self.assertEqual(len(values), 23, log)
+        cm = 72.27 / 2.54
+        for row, phases in ((1, (2, 3, 5)), (2, (3, 5, 6))):
+            for phase in phases:
+                self.assertAlmostEqual(values[f"{row}-{phase}-top"], values[f"{row}-3-top"], delta=0.01)
+                self.assertAlmostEqual(values[f"{row}-{phase}-bottom"], values[f"{row}-3-bottom"], delta=0.01)
+        for row in (1, 2):
+            self.assertAlmostEqual(values[f"{row}-3-bottom"] - values[f"{row + 1}-3-top"], cm, delta=0.01)
+            self.assertAlmostEqual(values[f"{row}-3-x"], values[f"{row + 1}-3-x"], delta=0.01)
+        self.assertGreater(values["2-3-top"] - values["2-3-bottom"], 4 * cm)
+        self.assertAlmostEqual(values["3-3-top"] - values["3-3-bottom"], 3 * cm, delta=0.01)
+        self.assertAlmostEqual(values["width"], values["expectedwidth"], delta=0.01)
+
+    def test_iterations_leave_clearance_for_inputs(self):
+        # An input can occupy the next row's column or the feedback arrow's route.
+        for input_phase in ("DesignAndDevelopment", "Demonstration"):
+            with self.subTest(phase=input_phase):
+                tall_input = r"\\".join(["Input line."] * 20)
+                source = (
+                    r"\newdimen\position\DSRIterations{\Iteration{"
+                    + "\\" + input_phase + "[" + tall_input + "]{Short body.}"
+                    + r"\Evaluation{Evaluate.}}"
+                    + r"\Iteration{\DesignAndDevelopment{Improve.}\Communication{Publish.}}"
+                    + r"\ifdsrmiterationmeasuring\else"
+                    + rf"\pgfextracty{{\position}}{{\pgfpointanchor{{dsrm-iteration-1-phase-{3 if input_phase == 'DesignAndDevelopment' else 4}-occupied}}{{center}}}}"
+                    + r"\typeout{DSRM-inputbottom=\the\position}"
+                    + r"\pgfextracty{\position}{\pgfpointanchor{dsrm-iteration-2-phase-3-north}{center}}"
+                    + r"\typeout{DSRM-nexttop=\the\position}\fi}"
+                )
+                log = self.compile(source=source)
+                values = {
+                    key: float(value)
+                    for key, value in re.findall(r"DSRM-([\w-]+)=(-?[\d.]+)pt", log)
+                }
+                self.assertEqual(len(values), 2, log)
+                self.assertAlmostEqual(values["inputbottom"] - values["nexttop"], 72.27 / 2.54, delta=0.01)
+
     def test_ieee_example(self):
         self.compile(example="tests/IEEEcsmag/test.tex")
 
