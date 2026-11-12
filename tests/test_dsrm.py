@@ -93,7 +93,7 @@ class DsrmTests(unittest.TestCase):
             \pgfextracty{\boxbottom}{\pgfpointanchor{inputbottom}{center}}
             \typeout{DSRM-#1-padding=\the\dimexpr\textbottom-\boxbottom\relax}
             % Both rectangle strokes are thick (0.8pt), adding 0.4pt at each end.
-            \typeout{DSRM-#1-extent=\the\dimexpr7cm-\boxbottom+.8pt\relax}
+            \typeout{DSRM-#1-extent=\the\dimexpr\phaseboxheight-\boxbottom+.8pt\relax}
         \end{tikzpicture}%
     }%
     \typeout{DSRM-#1-height=\the\dimexpr\ht\diagram+\dp\diagram\relax}
@@ -118,6 +118,45 @@ class DsrmTests(unittest.TestCase):
             self.assertAlmostEqual(
                 values[f"{size}-padding"], values[f"{size}-expected"], delta=0.01
             )
+
+    def test_phase_height_follows_each_phase_and_resets(self):
+        commands = (
+            "ProblemIdentification", "ObjectivesOfTheSolution",
+            "DesignAndDevelopment", "Demonstration", "Evaluation", "Communication",
+        )
+        long_text = r"\\".join(["A line of phase content."] * 16)
+        for tall_phase in commands:
+            with self.subTest(phase=tall_phase):
+                diagrams = []
+                for label in ("short", "long", "reset"):
+                    phases = []
+                    for command in commands:
+                        body = long_text if label == "long" and command == tall_phase else "Short body."
+                        phases.append("\\" + command + "{" + body + "}")
+                        phases.append(
+                            rf"\typeout{{DSRM-{label}-phase=\the\phaseboxheight}}"
+                        )
+                    diagrams.append(
+                        r"\sbox{\diagram}{\SDR{" + "\n".join(phases) + "}}\n"
+                        + rf"\typeout{{DSRM-{label}-height=\the\dimexpr\ht\diagram+\dp\diagram\relax}}"
+                    )
+                log = self.compile(source=r"\newsavebox{\diagram}" + "\n".join(diagrams)
+                                   + r"\usebox{\diagram}")
+                values = {
+                    key: float(value)
+                    for key, value in re.findall(r"DSRM-([\w-]+)=([\d.]+)pt", log)
+                }
+                self.assertGreater(values["long-phase"], 7 * 72.27 / 2.54)
+                self.assertLess(values["short-phase"], 7 * 72.27 / 2.54)
+                self.assertAlmostEqual(values["short-height"], values["reset-height"], delta=0.01)
+                self.assertAlmostEqual(
+                    values["long-height"] - values["short-height"],
+                    values["long-phase"] - values["short-phase"], delta=0.01,
+                )
+                # The final six measurements come from drawing, after the measuring pass.
+                heights = re.findall(r"DSRM-long-phase=([\d.]+)pt", log)[-6:]
+                self.assertEqual(len(heights), 6)
+                self.assertEqual(len(set(heights)), 1)
 
 
 if __name__ == "__main__":

@@ -25,6 +25,15 @@ gives this result in IEEE Computer Science magazines projects:
 
 ![result](assets/result.png)
 
+Phase boxes automatically share the height needed by the tallest phase body,
+with a minimum height of 3cm and padding beneath the text. Titles and connectors
+move with the shared height. Each diagram is measured independently, so multiple
+diagrams in one document can have different heights. Optional input boxes
+continue to size themselves independently.
+
+Phase bodies are typeset once for measurement and again for drawing. Avoid
+commands with side effects, such as counter increments, inside phase text.
+
 ## Tests
 
 Run the automated suite from the project root:
@@ -43,6 +52,8 @@ of the bundled IEEE class). No additional Python packages are needed.
 The suite compiles the article, standalone, and IEEE examples, exercises
 all four optional phase inputs with wrapped and formatted text, and checks
 that input boxes grow with their content while preserving width and bottom
-padding. Builds use temporary directories and leave the example files untouched.
+padding. It also checks that any of the six phases can set the shared phase
+height and that subsequent diagrams reset their height. Builds use temporary
+directories and leave the example files untouched.
 These checks verify compilation and geometry; visual styling still needs review
 of the rendered PDF.
