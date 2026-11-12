@@ -18,7 +18,7 @@ class DsrmTests(unittest.TestCase):
         if shutil.which("pdflatex") is None:
             raise RuntimeError("pdflatex is required; install a TeX distribution first")
 
-    def compile(self, source=None, example=None):
+    def compile(self, source=None, example=None, package_options=""):
         """Build in isolation while preserving example-relative package paths."""
         with tempfile.TemporaryDirectory(prefix="dsrm-test-") as directory:
             output = Path(directory)
@@ -26,7 +26,7 @@ class DsrmTests(unittest.TestCase):
                 document = output / "test.tex"
                 document.write_text(
                     "\\documentclass{article}\n"
-                    "\\usepackage{dsrm}\n"
+                    f"\\usepackage[{package_options}]{{dsrm}}\n"
                     "\\pagestyle{empty}\n"
                     "\\begin{document}\n" + source + "\n\\end{document}\n",
                     encoding="utf-8",
@@ -78,6 +78,94 @@ class DsrmTests(unittest.TestCase):
     \Communication{Communicate it.}
 }}
 """)
+
+    def test_input_boxes_require_text(self):
+        commands = (
+            "ProblemIdentification", "ObjectivesOfTheSolution",
+            "DesignAndDevelopment", "Demonstration",
+        )
+        diagrams = []
+        for index, command in enumerate(commands):
+            for label, optional in (("omitted", ""), ("empty", "[]"), ("filled", "[Input text]")):
+                marker = f"{index}-{label}"
+                diagrams.append(
+                    r"\sbox{\diagram}{\SDR{"
+                    + "\\" + command + optional + "{Phase body.}"
+                    # Without an input, the lowest edge is the phase rectangle at y=0.
+                    # Its 0.4pt half-stroke and the upper connector's 0.8pt half-stroke
+                    # extend the overall height by 1.2pt.
+                    + rf"\typeout{{DSRM-{marker}-expected=\the\dimexpr\phaseboxheight+1cm+1.2pt\relax}}"
+                    + "}}\n"
+                    + rf"\typeout{{DSRM-{marker}-height=\the\dimexpr\ht\diagram+\dp\diagram\relax}}"
+                )
+        log = self.compile(source=r"\newsavebox{\diagram}" + "\n".join(diagrams)
+                           + r"\usebox{\diagram}")
+        values = {
+            key: float(value)
+            for key, value in re.findall(r"DSRM-([\w-]+)=([\d.]+)pt", log)
+        }
+        self.assertEqual(len(values), 24, log)
+        for index, command in enumerate(commands):
+            with self.subTest(phase=command):
+                for label in ("omitted", "empty"):
+                    self.assertAlmostEqual(
+                        values[f"{index}-{label}-height"],
+                        values[f"{index}-{label}-expected"], delta=0.01,
+                    )
+                self.assertGreater(
+                    values[f"{index}-filled-height"], values[f"{index}-omitted-height"] + 50,
+                )
+
+    def test_show_empty_inputs_flag(self):
+        commands = (
+            "ProblemIdentification", "ObjectivesOfTheSolution",
+            "DesignAndDevelopment", "Demonstration",
+        )
+        diagrams = [r"\newsavebox{\diagram}"]
+        for state in ("enabled", "hidden", "restored"):
+            if state == "hidden":
+                diagrams.append(r"\begingroup\dsrmshowemptyinputsfalse")
+            elif state == "restored":
+                diagrams.append(r"\endgroup")
+            for index, command in enumerate(commands):
+                for label, optional in (("omitted", ""), ("empty", "[]"), ("filled", "[Input text]")):
+                    marker = f"{state}-{index}-{label}"
+                    diagrams.append(
+                        r"\sbox{\diagram}{\SDR{"
+                        + "\\" + command + optional + "{Phase body.}"
+                        + rf"\typeout{{DSRM-{marker}-expected=\the\dimexpr\phaseboxheight+1cm+1.2pt\relax}}"
+                        + "}}\n"
+                        + rf"\typeout{{DSRM-{marker}-height=\the\dimexpr\ht\diagram+\dp\diagram\relax}}"
+                    )
+        diagrams.append(r"\usebox{\diagram}")
+        log = self.compile(source="\n".join(diagrams), package_options="showemptyinputs")
+        values = {
+            key: float(value)
+            for key, value in re.findall(r"DSRM-([\w-]+)=([\d.]+)pt", log)
+        }
+        self.assertEqual(len(values), 72, log)
+        for index, command in enumerate(commands):
+            with self.subTest(phase=command):
+                for label in ("omitted", "empty", "filled"):
+                    self.assertAlmostEqual(
+                        values[f"enabled-{index}-{label}-height"],
+                        values[f"restored-{index}-{label}-height"], delta=0.01,
+                    )
+                    if label == "filled":
+                        self.assertAlmostEqual(
+                            values[f"enabled-{index}-{label}-height"],
+                            values[f"hidden-{index}-{label}-height"], delta=0.01,
+                        )
+                    else:
+                        self.assertAlmostEqual(
+                            values[f"hidden-{index}-{label}-height"],
+                            values[f"hidden-{index}-{label}-expected"], delta=0.01,
+                        )
+                        self.assertAlmostEqual(
+                            values[f"enabled-{index}-{label}-height"],
+                            values[f"enabled-{index}-{label}-expected"] + 3.5 * 72.27 / 2.54,
+                            delta=0.01,
+                        )
 
     def test_input_box_grows_with_text(self):
         log = self.compile(source=r"""

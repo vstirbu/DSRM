@@ -29,7 +29,22 @@ Phase boxes automatically share the height needed by the tallest phase body,
 with a minimum height of 3cm and padding beneath the text. Titles and connectors
 move with the shared height. Each diagram is measured independently, so multiple
 diagrams in one document can have different heights. Optional input boxes
-continue to size themselves independently.
+continue to size themselves independently. An input box and its arrow appear
+only when optional input text is supplied, for example
+`\ProblemIdentification[Input text]{Phase text}`. Omitting the optional argument
+or passing `[]` leaves that input box out.
+
+To show gray placeholders with dashed arrows for empty inputs, enable the
+`showemptyinputs` package option:
+
+```latex
+\usepackage[showemptyinputs]{dsrm}
+```
+
+You can also switch this flag in the document with `\dsrmshowemptyinputstrue`
+and `\dsrmshowemptyinputsfalse` before `\SDR{...}`. Wrap the switch and diagram
+in `\begingroup ... \endgroup` to apply it locally. Inputs containing text
+always render normally, regardless of the flag.
 
 Phase bodies are typeset once for measurement and again for drawing. Avoid
 commands with side effects, such as counter increments, inside phase text.

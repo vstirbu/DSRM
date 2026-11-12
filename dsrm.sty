@@ -18,6 +18,11 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{dsrm}[2026/11/13 DSRM package]
 
+\newif\ifdsrmshowemptyinputs
+\dsrmshowemptyinputsfalse
+\DeclareOption{showemptyinputs}{\dsrmshowemptyinputstrue}
+\ProcessOptions\relax
+
 \RequirePackage{xparse}
 \RequirePackage{ifthen}
 \RequirePackage{tikz}
@@ -75,13 +80,14 @@
     \draw (2,\phaseboxheight-2cm) rectangle (2,\phaseboxheight-2cm)
     node[below,text width=\mywidth, text centered] {#3};
 
-    \ifthenelse{\equal{#1}{}}{
-        \draw[thick, gray] (0,-3.5) rectangle (4, -1);
-        \draw[] (2,-2) rectangle (2, -2)
-        node[midway, text width=\mywidth, text centered, gray] {\textbf{\phaseinput{#2}}};
-        
-        \draw[ultra thick,-{Stealth}, gray, dashed] (2,-1) -- (2,0);%
-        }{
+    \ifthenelse{\equal{#1}{}}{%
+        \ifdsrmshowemptyinputs
+            \draw[thick, gray] (0,-3.5) rectangle (4,-1);
+            \node[text width=\mywidth, text centered, gray]
+                at (2,-2) {\textbf{\phaseinput{#2}}};
+            \draw[ultra thick,-{Stealth}, gray, dashed] (2,-1) -- (2,0);
+        \fi
+    }{%
         \node[text width=\mywidth, text centered]
             at (2,-2) {\textbf{\phaseinput{#2}}};
 
