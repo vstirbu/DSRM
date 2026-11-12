@@ -33,6 +33,9 @@ Run the automated suite from the project root:
 python3 -m unittest discover -s tests -v
 ```
 
+GitHub Actions runs this suite on every push and pull request. You can also
+run the Tests workflow manually from the Actions tab.
+
 Requires Python 3 and `pdflatex` on your PATH, with the LaTeX packages used
 by the examples installed (including TikZ, standalone, and the dependencies
 of the bundled IEEE class). No additional Python packages are needed.
