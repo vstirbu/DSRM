@@ -58,6 +58,32 @@ class DsrmTests(unittest.TestCase):
     def test_article_example(self):
         self.compile(example="tests/article/main.tex")
 
+    def test_diagram_has_no_extra_horizontal_space(self):
+        log = self.compile(source=r"""
+\newsavebox{\diagram}
+\makeatletter
+\tikzset{every picture/.append style={execute at end picture={%
+    \typeout{DSRM-expected=\the\dimexpr\pgf@picmaxx-\pgf@picminx\relax}%
+}}}
+\makeatother
+\sbox{\diagram}{\SDR{
+    \ProblemIdentification[Input text]{Phase body.}
+    \ObjectivesOfTheSolution{Phase body.}
+    \DesignAndDevelopment{Phase body.}
+    \Demonstration{Phase body.}
+    \Evaluation{Phase body.}
+    \Communication{Phase body.}
+}}
+\typeout{DSRM-width=\the\wd\diagram}
+\usebox{\diagram}
+""")
+        values = {
+            key: float(value)
+            for key, value in re.findall(r"DSRM-([\w-]+)=([\d.]+)pt", log)
+        }
+        self.assertEqual(len(values), 2, log)
+        self.assertAlmostEqual(values["width"], values["expected"], delta=0.01)
+
     def test_standalone_example(self):
         self.compile(example="tests/standalone/test.tex")
 
